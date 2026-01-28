@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: shadowdeploy-backend
+server:
+  port: 8080
