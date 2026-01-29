@@ -39,6 +39,19 @@ password: shadowdeploy
 
 The backend persists data in a local H2 file database at `./data/shadowdeploy`.
 
+### LLM insights
+
+Set environment variables to enable LLM-backed insights (OpenAI-compatible endpoint):
+
+```
+export SHADOW_LLM_ENABLED=true
+export SHADOW_LLM_API_KEY=your_api_key
+export SHADOW_LLM_BASE_URL=https://api.openai.com/v1/chat/completions
+export SHADOW_LLM_MODEL=gpt-4o-mini
+```
+
+If the API key is missing or the request fails, the backend falls back to heuristic insights.
+
 ## Frontend (React + Vite)
 
 ### Run

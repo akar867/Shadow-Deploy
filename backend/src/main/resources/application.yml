@@ -17,3 +17,10 @@ spring:
       enabled: true
 server:
   port: 8080
+shadowdeploy:
+  llm:
+    enabled: ${SHADOW_LLM_ENABLED:false}
+    base-url: ${SHADOW_LLM_BASE_URL:https://api.openai.com/v1/chat/completions}
+    api-key: ${SHADOW_LLM_API_KEY:}
+    model: ${SHADOW_LLM_MODEL:gpt-4o-mini}
+    timeout-seconds: ${SHADOW_LLM_TIMEOUT_SECONDS:20}

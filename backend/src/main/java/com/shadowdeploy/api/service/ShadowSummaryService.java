@@ -30,10 +30,14 @@ public class ShadowSummaryService {
 
     private final ShadowSummaryRepository summaryRepository;
     private final ObjectMapper objectMapper;
+    private final AiInsightService aiInsightService;
 
-    public ShadowSummaryService(ShadowSummaryRepository summaryRepository, ObjectMapper objectMapper) {
+    public ShadowSummaryService(ShadowSummaryRepository summaryRepository,
+                                ObjectMapper objectMapper,
+                                AiInsightService aiInsightService) {
         this.summaryRepository = summaryRepository;
         this.objectMapper = objectMapper;
+        this.aiInsightService = aiInsightService;
     }
 
     public ShadowSummaryResponse getLatestSummary() {
@@ -93,9 +97,26 @@ public class ShadowSummaryService {
 
         List<DiffFinding> findings = buildFindings(mismatchRate, driftRate, latencyDelta, dump.getServiceName());
         List<RiskItem> riskItems = buildRiskItems(findings, dump.getServiceName());
-        List<String> aiInsights = buildInsights(totalLines, mismatchRate, driftRate, latencyDelta, dump.getServiceName());
+        List<String> fallbackInsights = buildInsights(totalLines, mismatchRate, driftRate, latencyDelta,
+                dump.getServiceName());
 
         String status = statusForRisk(riskScore);
+        AiInsightContext context = new AiInsightContext(
+                dump.getDeploymentId(),
+                dump.getServiceName(),
+                status,
+                riskScore,
+                totalLines,
+                errorCount,
+                driftCount,
+                p95Latency,
+                mismatchRate,
+                driftRate,
+                latencyDelta,
+                metrics,
+                findings
+        );
+        List<String> aiInsights = aiInsightService.generateInsights(context, fallbackInsights);
 
         return new ShadowSummaryResponse(
                 dump.getDeploymentId(),
