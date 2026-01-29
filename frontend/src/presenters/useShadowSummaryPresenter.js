@@ -54,19 +54,35 @@ const statusLabelFor = (status, loading, error) => {
   return "Review required";
 };
 
-export function useShadowSummaryPresenter() {
+export function useShadowSummaryPresenter(token) {
   const [state, setState] = useState({
-    loading: true,
+    loading: false,
     error: null,
     data: null,
-    statusLabel: "Loading summary"
+    statusLabel: token ? "Loading summary" : "Login required"
   });
 
   const loadSummary = useCallback(async () => {
+    if (!token) {
+      setState({
+        loading: false,
+        error: null,
+        data: null,
+        statusLabel: "Login required"
+      });
+      return;
+    }
     setState((current) => ({ ...current, loading: true, error: null }));
     try {
-      const response = await fetch(`${API_BASE}/summary`);
+      const response = await fetch(`${API_BASE}/summary`, {
+        headers: {
+          "X-Shadow-Token": token
+        }
+      });
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error("Unauthorized");
+        }
         throw new Error(`Request failed with ${response.status}`);
       }
       const data = await response.json();
@@ -77,6 +93,15 @@ export function useShadowSummaryPresenter() {
         statusLabel: statusLabelFor(data.status, false, null)
       });
     } catch (error) {
+      if (error?.message === "Unauthorized") {
+        setState({
+          loading: false,
+          error: "Session expired. Please log in again.",
+          data: null,
+          statusLabel: "Login required"
+        });
+        return;
+      }
       setState({
         loading: false,
         error: error?.message ?? "Unable to reach backend",
@@ -84,7 +109,7 @@ export function useShadowSummaryPresenter() {
         statusLabel: statusLabelFor("needs-attention", false, error)
       });
     }
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     loadSummary();
@@ -94,7 +119,7 @@ export function useShadowSummaryPresenter() {
     if (!state.data) {
       return {
         ...state,
-        statusLabel: statusLabelFor("loading", state.loading, state.error)
+        statusLabel: state.statusLabel
       };
     }
     return {
@@ -103,8 +128,21 @@ export function useShadowSummaryPresenter() {
     };
   }, [state]);
 
+  const setSummary = useCallback((summary) => {
+    if (!summary) {
+      return;
+    }
+    setState({
+      loading: false,
+      error: null,
+      data: summary,
+      statusLabel: statusLabelFor(summary.status, false, null)
+    });
+  }, []);
+
   return {
     state: presenterState,
-    refresh: loadSummary
+    refresh: loadSummary,
+    setSummary
   };
 }

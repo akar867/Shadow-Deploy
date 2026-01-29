@@ -2,7 +2,6 @@ package com.shadowdeploy.api.controller;
 
 import com.shadowdeploy.api.model.ShadowSummaryResponse;
 import com.shadowdeploy.api.service.ShadowSummaryService;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -13,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
-@CrossOrigin(origins = "*")
 public class ShadowDeployController {
 
     private final ShadowSummaryService summaryService;
@@ -33,6 +31,6 @@ public class ShadowDeployController {
 
     @GetMapping("/summary")
     public ShadowSummaryResponse summary() {
-        return summaryService.buildSummary();
+        return summaryService.getLatestSummary();
     }
 }

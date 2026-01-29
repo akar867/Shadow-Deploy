@@ -1,5 +1,19 @@
 spring:
   application:
     name: shadowdeploy-backend
+  datasource:
+    url: jdbc:h2:file:./data/shadowdeploy;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+    driverClassName: org.h2.Driver
+    username: shadow
+    password: shadow
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
 server:
   port: 8080

@@ -1,6 +1,7 @@
 import React from "react";
+import TrafficDumpView from "./TrafficDumpView.jsx";
 
-export default function ShadowSummaryView({ state, onRefresh }) {
+export default function ShadowSummaryView({ state, onRefresh, trafficState, onUpload }) {
   const { data, loading, error } = state;
 
   if (!data) {
@@ -11,12 +12,14 @@ export default function ShadowSummaryView({ state, onRefresh }) {
         <button type="button" className="button ghost" onClick={onRefresh}>
           Try again
         </button>
+        {error ? <p className="notice warn">{error}</p> : null}
       </section>
     );
   }
 
   return (
     <section className="summary">
+      {error ? <p className="notice warn">{error}</p> : null}
       <div className="grid two">
         <div className="card">
           <h2>Deployment snapshot</h2>
@@ -110,6 +113,8 @@ export default function ShadowSummaryView({ state, onRefresh }) {
           </div>
         </div>
       </div>
+
+      <TrafficDumpView state={trafficState} onUpload={onUpload} />
     </section>
   );
 }

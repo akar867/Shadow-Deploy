@@ -21,7 +21,23 @@ mvn spring-boot:run
 ### Endpoints
 
 - `GET /api/health` - service status
-- `GET /api/summary` - shadow diff summary payload
+- `POST /api/auth/login` - login to receive an auth token
+- `GET /api/auth/me` - current user profile (requires token)
+- `POST /api/auth/logout` - revoke current token
+- `GET /api/summary` - latest shadow diff summary payload (requires token)
+- `GET /api/traffic-dumps` - list uploaded traffic dumps (requires token)
+- `POST /api/traffic-dumps` - upload a traffic dump (requires token)
+
+### Default credentials
+
+```
+username: admin
+password: shadowdeploy
+```
+
+### Storage
+
+The backend persists data in a local H2 file database at `./data/shadowdeploy`.
 
 ## Frontend (React + Vite)
 
@@ -35,6 +51,10 @@ npm run dev
 
 Vite proxies `/api` to `http://localhost:8080` so the frontend can call the backend without extra config.
 
+### Uploading traffic dumps
+
+Use the "Upload traffic dump" panel to send a text log or JSON lines file. The backend will store the dump, simulate shadow analysis, and update the summary metrics.
+
 ## MVP architecture
 
 - **Models**: API payloads returned by the backend.
@@ -44,5 +64,5 @@ Vite proxies `/api` to `http://localhost:8080` so the frontend can call the back
 ## Next steps
 
 - Add real traffic capture and shadow replay pipeline.
-- Persist diff results in a datastore.
+- Expand diff storage and retention policies.
 - Expand AI explanations with LLM-backed insight generation.
