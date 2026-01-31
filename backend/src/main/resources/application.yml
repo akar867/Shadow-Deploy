@@ -24,3 +24,7 @@ shadowdeploy:
     api-key: ${SHADOW_LLM_API_KEY:}
     model: ${SHADOW_LLM_MODEL:gpt-4o-mini}
     timeout-seconds: ${SHADOW_LLM_TIMEOUT_SECONDS:20}
+  replay:
+    shadow-base-url: ${SHADOW_REPLAY_SHADOW_BASE_URL:}
+    timeout-seconds: ${SHADOW_REPLAY_TIMEOUT_SECONDS:8}
+    max-response-bytes: ${SHADOW_REPLAY_MAX_RESPONSE_BYTES:200000}

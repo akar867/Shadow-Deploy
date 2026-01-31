@@ -35,43 +35,25 @@ public class TrafficDumpService {
         if (file == null || file.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Traffic dump file is required");
         }
-        TrafficDump dump = new TrafficDump();
-        dump.setFileName(file.getOriginalFilename() == null ? "traffic-dump" : file.getOriginalFilename());
-        dump.setContentType(file.getContentType() == null ? "text/plain" : file.getContentType());
-        dump.setSizeBytes(file.getSize());
-        dump.setServiceName(resolveServiceName(serviceName));
-        dump.setDeploymentId(resolveDeploymentId(deploymentId));
-        dump.setUploadedAt(Instant.now());
-        dump.setContent(readContent(file));
-        TrafficDump savedDump = trafficDumpRepository.save(dump);
-
-        ShadowSummaryResponse summary = summaryService.analyzeDump(savedDump);
-        ShadowSummaryEntity summaryEntity = summaryService.saveSummary(summary, savedDump);
-        savedDump.setSummaryId(summaryEntity.getId());
-        trafficDumpRepository.save(savedDump);
-
-        return new TrafficDumpUploadResponse(toResponse(savedDump), summary);
+        String content = readContent(file);
+        return ingestContent(
+                file.getOriginalFilename() == null ? "traffic-dump" : file.getOriginalFilename(),
+                file.getContentType() == null ? "text/plain" : file.getContentType(),
+                content,
+                serviceName,
+                deploymentId
+        );
     }
 
     public TrafficDumpUploadResponse runDemo(String deploymentId) {
         String content = loadDemoContent();
-        byte[] bytes = content.getBytes(StandardCharsets.UTF_8);
-        TrafficDump dump = new TrafficDump();
-        dump.setFileName("shadowdeploy-demo.jsonl");
-        dump.setContentType("application/json");
-        dump.setSizeBytes(bytes.length);
-        dump.setServiceName("checkout-service");
-        dump.setDeploymentId(resolveDeploymentId(deploymentId != null ? deploymentId : "demo-" + Instant.now()));
-        dump.setUploadedAt(Instant.now());
-        dump.setContent(content);
-        TrafficDump savedDump = trafficDumpRepository.save(dump);
-
-        ShadowSummaryResponse summary = summaryService.analyzeDump(savedDump);
-        ShadowSummaryEntity summaryEntity = summaryService.saveSummary(summary, savedDump);
-        savedDump.setSummaryId(summaryEntity.getId());
-        trafficDumpRepository.save(savedDump);
-
-        return new TrafficDumpUploadResponse(toResponse(savedDump), summary);
+        return ingestContent(
+                "shadowdeploy-demo.jsonl",
+                "application/json",
+                content,
+                "checkout-service",
+                deploymentId != null ? deploymentId : "demo-" + Instant.now()
+        );
     }
 
     public List<TrafficDumpResponse> list() {
@@ -113,6 +95,30 @@ public class TrafficDumpService {
         } catch (IOException ex) {
             throw new IllegalStateException("Unable to read uploaded traffic dump", ex);
         }
+    }
+
+    public TrafficDumpUploadResponse ingestContent(String fileName,
+                                                   String contentType,
+                                                   String content,
+                                                   String serviceName,
+                                                   String deploymentId) {
+        byte[] bytes = content == null ? new byte[0] : content.getBytes(StandardCharsets.UTF_8);
+        TrafficDump dump = new TrafficDump();
+        dump.setFileName(fileName == null ? "traffic-dump" : fileName);
+        dump.setContentType(contentType == null ? "text/plain" : contentType);
+        dump.setSizeBytes(bytes.length);
+        dump.setServiceName(resolveServiceName(serviceName));
+        dump.setDeploymentId(resolveDeploymentId(deploymentId));
+        dump.setUploadedAt(Instant.now());
+        dump.setContent(content == null ? "" : content);
+        TrafficDump savedDump = trafficDumpRepository.save(dump);
+
+        ShadowSummaryResponse summary = summaryService.analyzeDump(savedDump);
+        ShadowSummaryEntity summaryEntity = summaryService.saveSummary(summary, savedDump);
+        savedDump.setSummaryId(summaryEntity.getId());
+        trafficDumpRepository.save(savedDump);
+
+        return new TrafficDumpUploadResponse(toResponse(savedDump), summary);
     }
 
     private String loadDemoContent() {

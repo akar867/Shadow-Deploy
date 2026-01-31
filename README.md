@@ -52,13 +52,6 @@ Example JSONL schema (one request per line):
 ShadowDeploy can call an LLM to generate better explanations. If no API key is
 set, it falls back to built-in heuristics.
 
-```
-export SHADOW_LLM_ENABLED=true
-export SHADOW_LLM_API_KEY=your_api_key
-export SHADOW_LLM_BASE_URL=https://api.openai.com/v1/chat/completions
-export SHADOW_LLM_MODEL=gpt-4o-mini
-```
-
 ---
 
 # Developer setup
@@ -91,9 +84,54 @@ mvn test
 - GET /api/traffic-dumps - list uploaded traffic dumps (requires token)
 - POST /api/traffic-dumps - upload a traffic dump (requires token)
 - POST /api/demo/run - run a demo analysis (requires token)
+- POST /api/shadow/replay - replay captured traffic against shadow (requires token)
 
 ### Storage
 The backend persists data in a local H2 file database at ./data/shadowdeploy.
+
+### Shadow replay (basic pipeline)
+This adds a simple version of the "gateway → replay → diff" flow:
+
+1) Capture requests and production responses as JSON (one request per entry).
+2) Send them to /api/shadow/replay with a shadow base URL.
+3) ShadowDeploy replays the requests against the new code, compares responses,
+   and updates the dashboard.
+
+Minimal replay payload example:
+```json
+{
+  "serviceName": "checkout-service",
+  "deploymentId": "deploy-rc1",
+  "shadowBaseUrl": "http://localhost:9090",
+  "requests": [
+    {
+      "requestId": "req-1",
+      "method": "POST",
+      "path": "/checkout",
+      "headers": {"Content-Type": "application/json"},
+      "body": {"cartId": "c-1"},
+      "prodStatus": 200,
+      "prodBody": {"orderId": "o-1", "total": 44.99},
+      "prodLatencyMs": 180
+    }
+  ]
+}
+```
+
+You can set a default shadow base URL with:
+```
+export SHADOW_REPLAY_SHADOW_BASE_URL=http://localhost:9090
+```
+
+### LLM insights (optional)
+Set environment variables to enable LLM-backed insights (OpenAI-compatible endpoint):
+
+```
+export SHADOW_LLM_ENABLED=true
+export SHADOW_LLM_API_KEY=your_api_key
+export SHADOW_LLM_BASE_URL=https://api.openai.com/v1/chat/completions
+export SHADOW_LLM_MODEL=gpt-4o-mini
+```
 
 ## Frontend (React + Vite)
 ### Run
