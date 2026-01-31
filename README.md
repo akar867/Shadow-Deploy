@@ -89,6 +89,20 @@ mvn test
 ### Storage
 The backend persists data in a local H2 file database at ./data/shadowdeploy.
 
+### Spring integration (drop-in client)
+For a Spring Boot app, you can capture real traffic and send it to ShadowDeploy.
+See the sample code in:
+
+```
+integrations/spring-shadowdeploy-client
+```
+
+High-level steps:
+1) Copy the client classes into your Spring app.
+2) Configure `shadowdeploy.client.*` in application.yml.
+3) Provide a ShadowDeploy auth token from `/api/auth/login`.
+4) Set `shadow-base-url` to your shadow service endpoint.
+
 ### Shadow replay (basic pipeline)
 This adds a simple version of the "gateway → replay → diff" flow:
 
