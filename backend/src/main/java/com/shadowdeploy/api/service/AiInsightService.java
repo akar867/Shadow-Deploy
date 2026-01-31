@@ -106,6 +106,9 @@ public class AiInsightService {
         builder.append("Status: ").append(context.status()).append("\n");
         builder.append("Risk score: ").append(context.riskScore()).append("\n");
         builder.append("Total requests: ").append(context.totalRequests()).append("\n");
+        builder.append("Structured requests: ").append(context.structuredRequests()).append("\n");
+        builder.append("Status mismatches: ").append(context.statusMismatchCount()).append("\n");
+        builder.append("Payload diffs: ").append(context.payloadDiffCount()).append("\n");
         builder.append("Error count: ").append(context.errorCount()).append("\n");
         builder.append("Drift count: ").append(context.driftCount()).append("\n");
         builder.append("P95 latency: ").append(context.p95Latency()).append("ms").append("\n");

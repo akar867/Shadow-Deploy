@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export default function TrafficDumpView({ state, onUpload }) {
+export default function TrafficDumpView({ state, onUpload, onRunDemo }) {
   const [file, setFile] = useState(null);
   const [serviceName, setServiceName] = useState("");
   const [deploymentId, setDeploymentId] = useState("");
@@ -51,6 +51,23 @@ export default function TrafficDumpView({ state, onUpload }) {
               {state.uploading ? "Uploading..." : "Run shadow test"}
             </button>
           </div>
+          <div className="demo-row">
+            <button
+              type="button"
+              className="button ghost"
+              onClick={onRunDemo}
+              disabled={state.uploading}
+            >
+              Run demo mode
+            </button>
+            <span className="muted">
+              Uses built-in sample traffic for a one-click investor demo.
+            </span>
+          </div>
+          <p className="muted">
+            Sample files: <strong>samples/shadowdeploy-demo.jsonl</strong>,{" "}
+            <strong>samples/shadowdeploy-plain.log</strong>
+          </p>
           {state.error ? <p className="notice warn">{state.error}</p> : null}
           {state.message ? <p className="notice success">{state.message}</p> : null}
         </form>

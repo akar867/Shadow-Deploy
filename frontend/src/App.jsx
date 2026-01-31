@@ -19,6 +19,15 @@ export default function App() {
     }
   };
 
+  const handleDemo = async () => {
+    const result = await traffic.runDemo();
+    if (result?.summary) {
+      summary.setSummary(result.summary);
+    } else {
+      summary.refresh();
+    }
+  };
+
   if (auth.state.loading) {
     return (
       <div className="login">
@@ -73,6 +82,7 @@ export default function App() {
           onRefresh={summary.refresh}
           trafficState={traffic.state}
           onUpload={handleUpload}
+          onRunDemo={handleDemo}
         />
       </main>
     </div>

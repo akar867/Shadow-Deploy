@@ -1,7 +1,13 @@
 import React from "react";
 import TrafficDumpView from "./TrafficDumpView.jsx";
 
-export default function ShadowSummaryView({ state, onRefresh, trafficState, onUpload }) {
+export default function ShadowSummaryView({
+  state,
+  onRefresh,
+  trafficState,
+  onUpload,
+  onRunDemo
+}) {
   const { data, loading, error } = state;
 
   if (!data) {
@@ -114,7 +120,11 @@ export default function ShadowSummaryView({ state, onRefresh, trafficState, onUp
         </div>
       </div>
 
-      <TrafficDumpView state={trafficState} onUpload={onUpload} />
+      <TrafficDumpView
+        state={trafficState}
+        onUpload={onUpload}
+        onRunDemo={onRunDemo}
+      />
     </section>
   );
 }

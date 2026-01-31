@@ -34,6 +34,7 @@ mvn test
 - `GET /api/summary` - latest shadow diff summary payload (requires token)
 - `GET /api/traffic-dumps` - list uploaded traffic dumps (requires token)
 - `POST /api/traffic-dumps` - upload a traffic dump (requires token)
+- `POST /api/demo/run` - run a demo analysis (requires token)
 
 ### Default credentials
 
@@ -74,6 +75,27 @@ Vite proxies `/api` to `http://localhost:8080` so the frontend can call the back
 ### Uploading traffic dumps
 
 Use the "Upload traffic dump" panel to send a text log or JSON lines file. The backend will store the dump, simulate shadow analysis, and update the summary metrics.
+
+### Sample traffic dumps
+
+Try the included samples:
+
+```
+samples/shadowdeploy-demo.jsonl
+samples/shadowdeploy-plain.log
+```
+
+The JSONL sample includes structured prod/shadow payloads to exercise realistic diffing.
+
+Example JSONL schema (one request per line):
+
+```
+{"statusProd":200,"statusShadow":500,"latencyProdMs":210,"latencyShadowMs":480,"responseProd":{"ok":true},"responseShadow":{"error":"Timeout"}}
+```
+
+### Demo mode
+
+Use the "Run demo mode" button in the UI to instantly analyze a built-in sample without uploading a file.
 
 ## MVP architecture
 

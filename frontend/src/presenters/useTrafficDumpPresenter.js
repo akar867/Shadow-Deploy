@@ -111,9 +111,52 @@ export function useTrafficDumpPresenter(token) {
     [token]
   );
 
+  const runDemo = useCallback(async () => {
+    if (!token) {
+      setState((current) => ({
+        ...current,
+        error: "Login required to run demo mode"
+      }));
+      return null;
+    }
+    setState((current) => ({
+      ...current,
+      uploading: true,
+      error: null,
+      message: null
+    }));
+    try {
+      const response = await fetch(`${API_BASE}/demo/run`, {
+        method: "POST",
+        headers: {
+          "X-Shadow-Token": token
+        }
+      });
+      if (!response.ok) {
+        throw new Error("Demo run failed");
+      }
+      const payload = await response.json();
+      setState((current) => ({
+        ...current,
+        uploading: false,
+        message: "Demo traffic processed and summary updated.",
+        dumps: [payload.trafficDump, ...current.dumps]
+      }));
+      return payload;
+    } catch (error) {
+      setState((current) => ({
+        ...current,
+        uploading: false,
+        error: error?.message ?? "Demo run failed"
+      }));
+      return null;
+    }
+  }, [token]);
+
   return {
     state,
     load,
-    upload
+    upload,
+    runDemo
   };
 }
