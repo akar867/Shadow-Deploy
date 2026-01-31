@@ -87,7 +87,16 @@ mvn test
 - POST /api/shadow/replay - replay captured traffic against shadow (requires token)
 
 ### Storage
-The backend persists data in a local H2 file database at ./data/shadowdeploy.
+The backend uses MySQL by default. Configure credentials via environment
+variables:
+
+```
+export SHADOW_DB_URL=jdbc:mysql://localhost:3306/shadowdeploy?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+export SHADOW_DB_USERNAME=shadow
+export SHADOW_DB_PASSWORD=shadow
+```
+
+Tests still use an in-memory H2 database.
 
 ### Spring integration (drop-in client)
 For a Spring Boot app, you can capture real traffic and send it to ShadowDeploy.

@@ -2,19 +2,16 @@ spring:
   application:
     name: shadowdeploy-backend
   datasource:
-    url: jdbc:h2:file:./data/shadowdeploy;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
-    driverClassName: org.h2.Driver
-    username: shadow
-    password: shadow
+    url: ${SHADOW_DB_URL:jdbc:mysql://localhost:3306/shadowdeploy?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${SHADOW_DB_USERNAME:shadow}
+    password: ${SHADOW_DB_PASSWORD:shadow}
+    driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         format_sql: true
-  h2:
-    console:
-      enabled: true
 server:
   port: 8080
 shadowdeploy:
