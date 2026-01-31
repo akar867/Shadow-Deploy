@@ -48,6 +48,84 @@ Example JSONL schema (one request per line):
 {"statusProd":200,"statusShadow":500,"latencyProdMs":210,"latencyShadowMs":480,"responseProd":{"ok":true},"responseShadow":{"error":"Timeout"}}
 ```
 
+## Step-by-step: test your new code with real traffic
+
+### Step 1: Run your new code as a safe shadow instance
+You need a second copy of your app running side-by-side with production.
+It must be safe: no writes to prod DB, no emails, no payments.
+
+1) Create a shadow profile config (example `application-shadow.yml`):
+```yaml
+server:
+  port: 9090
+
+spring:
+  datasource:
+    url: jdbc:mysql://shadow-db:3306/app
+    username: readonly_user
+    password: readonly_pass
+
+feature-flags:
+  payments-enabled: false
+  emails-enabled: false
+  webhooks-enabled: false
+```
+
+2) Build and run the new version with the shadow profile:
+```bash
+./mvnw clean package
+SPRING_PROFILES_ACTIVE=shadow SERVER_PORT=9090 java -jar target/your-app.jar
+```
+
+3) Verify it is reachable:
+```bash
+curl http://localhost:9090/health
+```
+
+### Step 2: Capture real traffic and send it to ShadowDeploy
+Pick one integration path:
+
+#### Option A: Spring Boot (inside the service)
+1) Copy the client code from:
+```
+integrations/spring-shadowdeploy-client
+```
+2) Add config to your app:
+```yaml
+shadowdeploy:
+  client:
+    enabled: true
+    base-url: http://shadowdeploy-backend:8080
+    auth-token: YOUR_SHADOWDEPLOY_TOKEN
+    shadow-base-url: http://localhost:9090
+    service-name: your-service
+    deployment-id: deploy-rc1
+    sample-rate: 0.1
+```
+
+#### Option B: Spring Cloud Gateway (recommended)
+1) Copy the gateway integration code from:
+```
+integrations/spring-cloud-gateway-shadowdeploy
+```
+2) Add config to your gateway app:
+```yaml
+shadowdeploy:
+  gateway:
+    enabled: true
+    base-url: http://shadowdeploy-backend:8080
+    auth-token: YOUR_SHADOWDEPLOY_TOKEN
+    shadow-base-url: http://localhost:9090
+    service-name: your-service
+    deployment-id: deploy-rc1
+    sample-rate: 0.1
+```
+
+3) Restart your app or gateway.
+
+Now ShadowDeploy will capture real traffic, replay it against your new code,
+and update the dashboard automatically.
+
 ## AI insights (optional)
 ShadowDeploy can call an LLM to generate better explanations. If no API key is
 set, it falls back to built-in heuristics.
