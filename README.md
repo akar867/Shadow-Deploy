@@ -18,6 +18,13 @@ cd backend
 mvn spring-boot:run
 ```
 
+### Tests (JUnit 5)
+
+```bash
+cd backend
+mvn test
+```
+
 ### Endpoints
 
 - `GET /api/health` - service status
