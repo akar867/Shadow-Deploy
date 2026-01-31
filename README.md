@@ -97,6 +97,12 @@ See the sample code in:
 integrations/spring-shadowdeploy-client
 ```
 
+If you use Spring Cloud Gateway, see:
+
+```
+integrations/spring-cloud-gateway-shadowdeploy
+```
+
 High-level steps:
 1) Copy the client classes into your Spring app.
 2) Configure `shadowdeploy.client.*` in application.yml.
