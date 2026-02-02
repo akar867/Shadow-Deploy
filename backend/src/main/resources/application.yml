@@ -2,9 +2,9 @@ spring:
   application:
     name: shadowdeploy-backend
   datasource:
-    url: ${SHADOW_DB_URL:jdbc:mysql://localhost:3306/shadowdeploy?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
-    username: ${SHADOW_DB_USERNAME:shadow}
-    password: ${SHADOW_DB_PASSWORD:shadow}
+    url: jdbc:mysql://localhost:3306/shadowdeploy?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+    username: root
+    password: root
     driverClassName: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:

@@ -37,19 +37,19 @@ public class ShadowSummaryEntity {
     private double riskScore;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name = "metrics_json", columnDefinition = "LONGTEXT")
     private String metricsJson;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name = "findings_json", columnDefinition = "LONGTEXT")
     private String findingsJson;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name = "risk_items_json", columnDefinition = "LONGTEXT")
     private String riskItemsJson;
 
     @Lob
-    @Column(nullable = false)
+    @Column(name = "ai_insights_json", columnDefinition = "LONGTEXT")
     private String aiInsightsJson;
 
     @ManyToOne(fetch = FetchType.LAZY)

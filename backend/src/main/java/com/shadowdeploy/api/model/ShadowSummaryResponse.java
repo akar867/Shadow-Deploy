@@ -12,5 +12,4 @@ public record ShadowSummaryResponse(
         List<DiffFinding> findings,
         List<RiskItem> riskItems,
         List<String> aiInsights
-) {
-}
+) {}

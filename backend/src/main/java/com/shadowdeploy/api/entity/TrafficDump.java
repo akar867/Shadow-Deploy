@@ -39,7 +39,7 @@ public class TrafficDump {
     private Long summaryId;
 
     @Lob
-    @Column(nullable = false)
+    @Column(nullable = false,name = "content",columnDefinition = "LONGTEXT")
     private String content;
 
     public Long getId() {

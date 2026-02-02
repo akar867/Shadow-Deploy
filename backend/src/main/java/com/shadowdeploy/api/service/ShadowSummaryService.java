@@ -10,6 +10,8 @@ import com.shadowdeploy.api.model.DiffMetric;
 import com.shadowdeploy.api.model.RiskItem;
 import com.shadowdeploy.api.model.ShadowSummaryResponse;
 import com.shadowdeploy.api.repository.ShadowSummaryRepository;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -26,6 +28,9 @@ import java.util.regex.Pattern;
 
 @Service
 public class ShadowSummaryService {
+	
+	@Autowired
+    private ShadowSummaryRepository shadowSummaryRepository;
 
     private static final double BASELINE_P95_MS = 200.0;
     private static final double PAYLOAD_DRIFT_THRESHOLD = 0.08;
@@ -142,8 +147,40 @@ public class ShadowSummaryService {
                 findings
         );
         List<String> aiInsights = aiInsightService.generateInsights(context, fallbackInsights);
+        
+        ObjectMapper mapper = new ObjectMapper();
 
+        ShadowSummaryEntity entity = new ShadowSummaryEntity();
+        entity.setDeploymentId(dump.getDeploymentId());
+        entity.setServiceName(dump.getServiceName());
+        entity.setStatus(status);
+        entity.setGeneratedAt(Instant.now());
+        entity.setRiskScore(riskScore);
+
+        try {
+            entity.setMetricsJson(mapper.writeValueAsString(metrics));
+            entity.setFindingsJson(mapper.writeValueAsString(findings));
+            entity.setRiskItemsJson(mapper.writeValueAsString(riskItems));
+            entity.setAiInsightsJson(mapper.writeValueAsString(aiInsights));
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to serialize summary JSON", e);
+        }
+
+        shadowSummaryRepository.save(entity);
+        
         return new ShadowSummaryResponse(
+                entity.getDeploymentId(),
+                entity.getServiceName(),
+                entity.getStatus(),
+                entity.getGeneratedAt().toString(),
+                entity.getRiskScore(),
+                metrics,
+                findings,
+                riskItems,
+                aiInsights
+        );
+
+      /*  return new ShadowSummaryResponse(
                 dump.getDeploymentId(),
                 dump.getServiceName(),
                 status,
@@ -153,7 +190,7 @@ public class ShadowSummaryService {
                 findings,
                 riskItems,
                 aiInsights
-        );
+        ); */
     }
 
     public void ensureSeedSummary() {
