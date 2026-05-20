@@ -256,7 +256,7 @@ without extra config.
 - Presenters: React hooks that load data and shape UI state (src/presenters).
 - Views: Stateless components that render UI (src/views).
 
-## Next steps
+## Further extensions
 - Add real traffic capture and shadow replay pipeline.
 - Expand diff storage and retention policies.
 - Expand AI explanations with LLM-backed insight generation.
